@@ -897,8 +897,9 @@ function Editor({ project, onBack, onPresent }) {
           </div>
 
           {/* NLP BAR */}
-          <div style={{ padding:'10px 16px', borderTop:'1px solid var(--bd)',
-            background:'var(--d)', flexShrink:0, position:'relative', zIndex:20 }}>
+          <div style={{ padding:'12px 16px', borderTop:'1px solid var(--bd)',
+            background:'var(--d)', flexShrink:0, position:'relative', zIndex:20,
+            touchAction:'auto' }}>
             {log.length > 0 && (
               <div style={{ marginBottom:8, maxHeight:72, overflowY:'auto',
                 display:'flex', flexDirection:'column', gap:3 }}>
@@ -931,9 +932,11 @@ function Editor({ project, onBack, onPresent }) {
                 <Ico d="M9.663 17h4.673M12 3v1m6.364 1.636-.707.707M21 12h-1M17.657 17.657l-.707-.707M12 20v1M6.343 17.657l-.707.707M4 12H3M6.343 6.343l-.707-.707" size={14} color="var(--gold)"/>
                 <input value={nlp} onChange={e => setNlp(e.target.value)}
                   onKeyDown={e => e.key==='Enter' && handleNLP()}
-                  placeholder={`Describe a change… e.g. "move the sofa 1m north" or "add a dining table"`}
+                  placeholder={`Type a command… e.g. "move the sofa 1m north"`}
                   style={{ flex:1, background:'none', border:'none', outline:'none',
-                    color:'var(--t)', fontSize:12, fontFamily:'var(--ui)' }}/>
+                    color:'var(--t)', fontSize:14, fontFamily:'var(--ui)',
+                    WebkitAppearance:'none', minHeight:44, padding:'4px 0',
+                    touchAction:'auto', userSelect:'text', WebkitUserSelect:'text' }}/>
                 {nlp && <span style={{ fontSize:10, fontFamily:'var(--mn)', color:'var(--t3)' }}>↵</span>}
               </div>
               <button onClick={handleNLP} disabled={!nlp.trim()||nlpBusy} className="bp"
