@@ -850,7 +850,7 @@ function Editor({ project, onBack, onPresent }) {
         </aside>
 
         {/* CANVAS */}
-        <div style={{ flex:1, display:'flex', flexDirection:'column', position:'relative', overflow:'hidden' }}>
+        <div style={{ flex:1, display:'flex', flexDirection:'column', position:'relative' }}>
           <div style={{ flex:1, position:'relative', overflow:'hidden' }}>
             <canvas ref={canvasRef} style={{ display:'block', width:'100%', height:'100%', touchAction:'none' }}/>
 
@@ -898,7 +898,7 @@ function Editor({ project, onBack, onPresent }) {
 
           {/* NLP BAR */}
           <div style={{ padding:'10px 16px', borderTop:'1px solid var(--bd)',
-            background:'var(--d)', flexShrink:0 }}>
+            background:'var(--d)', flexShrink:0, position:'relative', zIndex:20 }}>
             {log.length > 0 && (
               <div style={{ marginBottom:8, maxHeight:72, overflowY:'auto',
                 display:'flex', flexDirection:'column', gap:3 }}>
