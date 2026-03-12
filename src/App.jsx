@@ -186,16 +186,33 @@ function useScene(canvasRef, sceneData, selectedId, onSelect) {
     moveCam();
 
     const ray = new THREE.Raycaster();
-    const onDown = e => { drag.current = { on:true, x:e.clientX, y:e.clientY, sx:e.clientX, sy:e.clientY }; };
+    const getXY = e => e.touches ? { x: e.touches[0].clientX, y: e.touches[0].clientY } : { x: e.clientX, y: e.clientY };
+    const onDown = e => { const {x,y} = getXY(e); drag.current = { on:true, x, y, sx:x, sy:y }; };
     const onMove = e => {
       if (!drag.current.on) return;
-      const dx = e.clientX - drag.current.x, dy = e.clientY - drag.current.y;
-      drag.current.x = e.clientX; drag.current.y = e.clientY;
+      const {x,y} = getXY(e);
+      const dx = x - drag.current.x, dy = y - drag.current.y;
+      drag.current.x = x; drag.current.y = y;
       orbit.current.theta -= dx * .007;
       orbit.current.phi = Math.max(.08, Math.min(1.48, orbit.current.phi + dy * .005));
       moveCam();
     };
-    const onUp    = () => { drag.current.on = false; };
+    const onUp    = e => {
+      if (e.type === 'touchend' && e.changedTouches) {
+        const t = e.changedTouches[0];
+        if (Math.abs(t.clientX-drag.current.sx)+Math.abs(t.clientY-drag.current.sy) < 6) {
+          const rect = canvas.getBoundingClientRect();
+          const mv = new THREE.Vector2(
+            ((t.clientX-rect.left)/rect.width)*2-1,
+            -((t.clientY-rect.top)/rect.height)*2+1
+          );
+          ray.setFromCamera(mv, cam);
+          const hits = ray.intersectObjects(scene.children, true).filter(h => h.object.userData.id);
+          onSelect(hits.length ? hits[0].object.userData.id : null);
+        }
+      }
+      drag.current.on = false;
+    };
     const onWheel = e => {
       e.preventDefault();
       orbit.current.r = Math.max(4, Math.min(55, orbit.current.r + e.deltaY * .04));
@@ -220,6 +237,9 @@ function useScene(canvasRef, sceneData, selectedId, onSelect) {
     canvas.addEventListener('mousedown', onDown);
     canvas.addEventListener('mousemove', onMove);
     canvas.addEventListener('mouseup', onUp);
+    canvas.addEventListener('touchstart', onDown, { passive:true });
+    canvas.addEventListener('touchmove', onMove, { passive:true });
+    canvas.addEventListener('touchend', onUp);
     canvas.addEventListener('wheel', onWheel, { passive:false });
     canvas.addEventListener('click', onClick);
     canvas.addEventListener('contextmenu', e => e.preventDefault());
@@ -832,7 +852,7 @@ function Editor({ project, onBack, onPresent }) {
         {/* CANVAS */}
         <div style={{ flex:1, display:'flex', flexDirection:'column', position:'relative', overflow:'hidden' }}>
           <div style={{ flex:1, position:'relative', overflow:'hidden' }}>
-            <canvas ref={canvasRef} style={{ display:'block', width:'100%', height:'100%' }}/>
+            <canvas ref={canvasRef} style={{ display:'block', width:'100%', height:'100%', touchAction:'none' }}/>
 
             {/* HUD */}
             <div style={{ position:'absolute', top:14, left:14, display:'flex', gap:8, pointerEvents:'none' }}>
